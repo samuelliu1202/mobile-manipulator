@@ -12,7 +12,7 @@ This project simulates the autonomous navigation and manipulation of a Turtlebot
 * Launch Turtlebot4 robot into Gazebo world and move with teleop keyboard
 * Implement SLAM using slam_toolbox package
 ### Current
-* Integrating Nav2 for autonomous navigation within map
+* Integrating Nav2 for autonomous navigation
 ### Future
 * Combine camera object detection (ex: YOLO) data and combine with LiDAR data for SLAM mapping
 * Develop autonomous manipulation for WidowX robotic arm using MoveIt2 and object detection

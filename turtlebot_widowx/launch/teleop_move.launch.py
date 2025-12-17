@@ -33,7 +33,7 @@ def generate_launch_description():
     )
 
     delayed_teleop = TimerAction(
-        period = 7.5,
+        period = 5.0,
         actions=[teleop]
     )
 

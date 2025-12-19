@@ -1,11 +1,11 @@
 # Mobile Manipulator Simulation Project
-This project simulates the autonomous navigation and manipulation of a Turtlebot 4 mobile robot with a WidowX 250 robotic arm.
+## Overview
+This ROS2 project develops an autonomous mobile manipulation system with TurtleBot 4 mobile robot and WidowX 250 robotic arm.
 
-## Description
-### Tools Used
-* ROS2 Jazzy
-* Gazebo Harmonic
-* RViz2
+## Tech Stack
+* ROS2 Jazzy - robot middleware
+* Gazebo Harmonic - physical simulation
+* RViz2 - visualization
 
 ## Progress
 ### Completed
@@ -14,17 +14,45 @@ This project simulates the autonomous navigation and manipulation of a Turtlebot
 ### Current
 * Integrating Nav2 for autonomous navigation
 ### Future
-* Combine camera object detection (ex: YOLO) data and combine with LiDAR data for SLAM mapping
-* Develop autonomous manipulation for WidowX robotic arm using MoveIt2 and object detection
+* Create YOLO-based object detection pipeline
+* Combine camera object detection data with LiDAR data for SLAM mapping
+* Develop autonomous manipulation for WidowX robotic arm using MoveIt2 and object detection data
 * Implement multi-robot coordination with other robots
 
-## Dependencies
-### ROS Packages
-* SLAM Toolbox: https://github.com/SteveMacenski/slam_toolbox
-* Nav2: https://github.com/ros-navigation/navigation2
-* MoveIt2: https://github.com/moveit/moveit2
-* Turtlebot 4: https://github.com/turtlebot/turtlebot4_simulator
-* WidowX 250: https://github.com/Interbotix/interbotix_ros_manipulators
+## Installation
+### System Prerequisites
+* Ubuntu 24.04 LTS
+* ROS2 Jazzy: `sudo apt install ros-jazzy-desktop`
+* Gazebo Harmonic: `sudo apt-get install gz-harmonic`
+
+### Setup
+#### Clone Repository
+```
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/samuelliu1202/mobile-manipulator.git
+```
+
+#### Install dependencies
+```
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src
+```
+
+#### Build
+```
+cd ~/ros2_ws
+colcon build --packages-select turtlebot_widowx
+source install/setup.bash
+```
+
+## Quick Start
+Launch current system (Gazebo simulation, SLAM mapping, Rviz visualization, teleop control): `ros2 launch turtlebot_widowx slam_teleop.launch.py`
+
+## Resources
+* [TurtleBot 4 Docs](https://turtlebot.github.io/turtlebot4-user-manual/)
+* [SLAM Toolbox](https://github.com/SteveMacenski/slam_toolbox)
+* [Nav2](https://github.com/ros-navigation/navigation2)
 
 ## Authors
 Samuel Liu - syl63@cam.ac.uk

@@ -13,7 +13,7 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
     proj_dir = get_package_share_directory('turtlebot_widowx')
 
-    world_file = os.path.join(proj_dir, 'worlds', 'warehouse.sdf')
+    world_file = os.path.join(proj_dir, 'worlds', 'test4.sdf')
 
     #gazebo_launch = ExecuteProcess(cmd=['gz','sim','-r',world_file], output='screen')
     gazebo_launch = IncludeLaunchDescription(

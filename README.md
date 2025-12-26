@@ -11,13 +11,15 @@ This ROS2 project develops an autonomous mobile manipulation system with TurtleB
 ### Completed
 * Launch Turtlebot4 robot into Gazebo world and move with teleop keyboard
 * Implement SLAM using slam_toolbox package
+* Add Nav2 and Localization
 ### Current
-* Integrating Nav2 for autonomous navigation
+* Fixing noisy localization during autonomous navigation
 ### Future
 * Create YOLO-based object detection pipeline
 * Combine camera object detection data with LiDAR data for SLAM mapping
-* Develop autonomous manipulation for WidowX robotic arm using MoveIt2 and object detection data
-* Implement multi-robot coordination with other robots
+* Modify Turtlebot URDF file to add WidowX robotic arm
+* Develop autonomous manipulation for robotic arm using MoveIt2 and object detection data
+* Implement multi-robot coordination
 
 ## Installation
 ### System Prerequisites

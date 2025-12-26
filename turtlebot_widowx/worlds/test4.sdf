@@ -41,6 +41,7 @@
         </uri>
         <name>'cone_1'</name>
         <pose>2 2 0 0 0 0</pose>
+        <static>true</static>
     </include>
 
     <include>
@@ -49,6 +50,7 @@
         </uri>
         <name>'cone_2'</name>
         <pose>1.5 -1 0 0 0 0</pose>
+        <static>true</static>
     </include>
 
     <include>
@@ -57,6 +59,7 @@
         </uri>
         <name>'cone_3'</name>
         <pose>-1.5 2 0 0 0 0</pose>
+        <static>true</static>
     </include>
 
     <include>
@@ -65,6 +68,7 @@
         </uri>
         <name>'cone_4'</name>
         <pose>-2 -2 0 0 0 0</pose>
+        <static>true</static>
     </include>
 
     <include>
@@ -73,6 +77,88 @@
         </uri>
         <name>'cone_5'</name>
         <pose>0 -3 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_6'</name>
+        <pose>-3 1 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_7'</name>
+        <pose>0.5 1 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_8'</name>
+        <pose>-1.5 -1.5 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_9'</name>
+        <pose>-2.5 -2.5 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_10'</name>
+        <pose>-1 -1 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_11'</name>
+        <pose>-2 0 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_12'</name>
+        <pose>-2.5 -0.5 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_13'</name>
+        <pose>-3 -1 0 0 0 0</pose>
+        <static>true</static>
+    </include>
+
+    <include>
+        <uri>
+            https://fuel.gazebosim.org/1.0/OpenRobotics/models/Construction Cone
+        </uri>
+        <name>'cone_14'</name>
+        <pose>-3.5 -1.5 0 0 0 0</pose>
+        <static>true</static>
     </include>
 
 

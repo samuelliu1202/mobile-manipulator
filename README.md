@@ -49,7 +49,8 @@ source install/setup.bash
 ```
 
 ## Quick Start
-Launch current system (Gazebo simulation, SLAM mapping, Rviz visualization, teleop control): `ros2 launch turtlebot_widowx slam_teleop.launch.py`
+Launch SLAM with teleop control: `ros2 launch turtlebot_widowx slam_teleop.launch.py`
+Launch Nav2 with SLAM map data: `ros2 launch turtlebot_widowx navigation_full.launch.py`
 
 ## Resources
 * [TurtleBot 4 Docs](https://turtlebot.github.io/turtlebot4-user-manual/)

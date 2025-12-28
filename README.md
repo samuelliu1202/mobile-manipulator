@@ -49,13 +49,10 @@ source install/setup.bash
 ```
 
 ## Quick Start
-Launch SLAM with teleop control: `ros2 launch turtlebot_widowx slam_teleop.launch.py`
+Launch SLAM with teleop control: `ros2 launch turtlebot_widowx slam_teleop.launch.py`\
 Launch Nav2 with SLAM map data: `ros2 launch turtlebot_widowx navigation_full.launch.py`
 
 ## Resources
 * [TurtleBot 4 Docs](https://turtlebot.github.io/turtlebot4-user-manual/)
 * [SLAM Toolbox](https://github.com/SteveMacenski/slam_toolbox)
 * [Nav2](https://github.com/ros-navigation/navigation2)
-
-## Authors
-Samuel Liu - syl63@cam.ac.uk

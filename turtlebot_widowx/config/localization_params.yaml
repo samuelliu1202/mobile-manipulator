@@ -39,11 +39,13 @@ amcl:
     z_rand: 0.2
     z_short: 0.05
     scan_topic: scan
-    # Auto-set initial pose so no manual 2D Pose Estimate needed in RViz
+    # Auto-set initial pose so no manual 2D Pose Estimate needed in RViz.
+    # Gazebo spawns robot at world (0,0); map origin is [-8.690, -6.657],
+    # so robot's position in map frame = (0 - (-8.690), 0 - (-6.657)).
     set_initial_pose: true
     initial_pose:
-      x: 0.0
-      y: 0.0
+      x: 8.690
+      y: 6.657
       z: 0.0
       yaw: 0.0
 

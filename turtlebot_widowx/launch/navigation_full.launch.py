@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import TimerAction, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -42,7 +42,9 @@ def generate_launch_description():
 
     return LaunchDescription([
         spawn_robot,
-        localization,
+        # Delay localization so odom TF is in the cache before AMCL's message filter runs.
+        # Without this, early scans are dropped ("timestamp earlier than all data in cache").
+        TimerAction(period=5.0, actions=[localization]),
         nav2,
         rviz,
     ])

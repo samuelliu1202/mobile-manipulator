@@ -44,7 +44,8 @@ def generate_launch_description():
         spawn_robot,
         # Delay localization so odom TF is in the cache before AMCL's message filter runs.
         # Without this, early scans are dropped ("timestamp earlier than all data in cache").
-        TimerAction(period=5.0, actions=[localization]),
+        # 10s: robot spawns at 5s, TF cache populates over the next few seconds.
+        TimerAction(period=10.0, actions=[localization]),
         nav2,
         rviz,
     ])

@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -76,9 +76,6 @@ def generate_launch_description():
         DeclareLaunchArgument('yaw', default_value='0.0', description='Robot spawn yaw in Gazebo world'),
         gazebo_launch,
         tb4_robot,
-        # Delay robot spawn so Gazebo's gz_ros2_control plugin fully loads before
-        # turtlebot4_spawn's controller spawner activates the diffdrive controller.
-        # Without this delay the controller stays INACTIVE ("can't accept new commands").
-        TimerAction(period=8.0, actions=[robot_spawn]),
+        robot_spawn,
         clock_bridge
     ])

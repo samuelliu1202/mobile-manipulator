@@ -79,6 +79,6 @@ def generate_launch_description():
         # Delay robot spawn so Gazebo's gz_ros2_control plugin fully loads before
         # turtlebot4_spawn's controller spawner activates the diffdrive controller.
         # Without this delay the controller stays INACTIVE ("can't accept new commands").
-        TimerAction(period=5.0, actions=[robot_spawn]),
+        TimerAction(period=8.0, actions=[robot_spawn]),
         clock_bridge
     ])

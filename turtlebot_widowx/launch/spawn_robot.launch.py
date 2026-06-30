@@ -1,8 +1,9 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import PathJoinSubstitution
@@ -32,8 +33,8 @@ def generate_launch_description():
     tb4_robot = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([
-                FindPackageShare('turtlebot4_gz_bringup'), 
-                'launch', 
+                FindPackageShare('turtlebot4_gz_bringup'),
+                'launch',
                 'ros_gz_bridge.launch.py'
             ])
         ),
@@ -45,17 +46,20 @@ def generate_launch_description():
     robot_spawn = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([
-                FindPackageShare('turtlebot4_gz_bringup'), 
-                'launch', 
+                FindPackageShare('turtlebot4_gz_bringup'),
+                'launch',
                 'turtlebot4_spawn.launch.py'
             ])
         ),
         launch_arguments={
-            'model':'standard',
+            'model': 'standard',
+            'x': LaunchConfiguration('x'),
+            'y': LaunchConfiguration('y'),
+            'yaw': LaunchConfiguration('yaw'),
         }.items()
     )
 
-    
+
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -64,9 +68,12 @@ def generate_launch_description():
         arguments = ['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
         parameters=[{'use_sim_time': True}]
     )
-    
+
 
     return LaunchDescription([
+        DeclareLaunchArgument('x', default_value='0.0', description='Robot spawn X position in Gazebo world'),
+        DeclareLaunchArgument('y', default_value='0.0', description='Robot spawn Y position in Gazebo world'),
+        DeclareLaunchArgument('yaw', default_value='0.0', description='Robot spawn yaw in Gazebo world'),
         gazebo_launch,
         tb4_robot,
         robot_spawn,

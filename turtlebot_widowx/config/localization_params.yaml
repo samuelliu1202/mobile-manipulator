@@ -39,6 +39,10 @@ amcl:
     z_rand: 0.2
     z_short: 0.05
     scan_topic: scan
+    set_initial_pose: true
+    initial_pose_x: 8.690
+    initial_pose_y: 6.657
+    initial_pose_a: 0.0
 
 map_saver:
   ros__parameters:

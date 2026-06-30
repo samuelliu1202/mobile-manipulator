@@ -19,30 +19,39 @@ def generate_launch_description():
         )
     )
 
-    nav2 = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(proj_dir, 'launch', 'nav2.launch.py')
-        )
+    # Localization (AMCL + map_server) needs: map file, /scan, odom→base_link TF.
+    # Gazebo takes ~5-10s to load and publish all of these, so delay startup.
+    localization = TimerAction(
+        period=10.0,
+        actions=[IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(proj_dir, 'launch', 'localization.launch.py')
+            )
+        )]
     )
 
-    localization = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(proj_dir, 'launch', 'localization.launch.py')
-        )
+    # Nav2 needs AMCL to have published map→odom TF before accepting goals.
+    nav2 = TimerAction(
+        period=15.0,
+        actions=[IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(proj_dir, 'launch', 'nav2.launch.py')
+            )
+        )]
     )
 
     rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d',rviz_config],
+        arguments=['-d', rviz_config],
         parameters=[{'use_sim_time': True}],
         output='screen'
     )
 
     return LaunchDescription([
         spawn_robot,
-        nav2,
         localization,
-        rviz
+        nav2,
+        rviz,
     ])

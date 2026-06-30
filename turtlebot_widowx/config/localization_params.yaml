@@ -43,6 +43,11 @@ amcl:
     initial_pose_x: 8.690
     initial_pose_y: 6.657
     initial_pose_a: 0.0
+    # Tight covariance: robot spawns at a known precise location so start with
+    # a concentrated particle cloud. Wide covariance causes oscillatory convergence.
+    initial_cov_xx: 0.1
+    initial_cov_yy: 0.1
+    initial_cov_aa: 0.05
 
 map_saver:
   ros__parameters:

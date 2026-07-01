@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import TimerAction, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
 
@@ -19,15 +19,15 @@ def generate_launch_description():
         )
     )
 
-    localization = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(proj_dir, 'launch', 'localization.launch.py')
-        )
-    )
-
     nav2 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(proj_dir, 'launch', 'nav2.launch.py')
+        )
+    )
+
+    localization = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(proj_dir, 'launch', 'localization.launch.py')
         )
     )
 
@@ -35,7 +35,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', rviz_config],
+        arguments=['-d',rviz_config],
         parameters=[{'use_sim_time': True}],
         output='screen'
     )
@@ -44,5 +44,5 @@ def generate_launch_description():
         spawn_robot,
         nav2,
         localization,
-        rviz,
+        rviz
     ])

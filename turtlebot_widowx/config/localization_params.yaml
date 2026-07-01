@@ -31,7 +31,7 @@ amcl:
     # Laser model — trust sim LiDAR readings more
     sigma_hit: 0.1
     tf_broadcast: true
-    transform_tolerance: 0.3
+    transform_tolerance: 1.0
     update_min_a: 0.1
     update_min_d: 0.1
     z_hit: 0.8

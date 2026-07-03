@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -71,6 +71,7 @@ def generate_launch_description():
 
 
     return LaunchDescription([
+        SetEnvironmentVariable('RMW_IMPLEMENTATION', 'rmw_cyclonedds_cpp'),
         DeclareLaunchArgument('x', default_value='0.0', description='Robot spawn X position in Gazebo world'),
         DeclareLaunchArgument('y', default_value='0.0', description='Robot spawn Y position in Gazebo world'),
         DeclareLaunchArgument('yaw', default_value='0.0', description='Robot spawn yaw in Gazebo world'),

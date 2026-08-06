@@ -33,7 +33,12 @@ ARGS = [
     DeclareLaunchArgument('use_sim_time', default_value='true'),
     DeclareLaunchArgument(
         'world', default_value='',
-        description='Absolute path to a .world/.sdf. Empty = turtlebot3_world.world.'),
+        description='Absolute path to a .world/.sdf. Empty = our forked turtlebot3_world.world.'),
+    DeclareLaunchArgument(
+        'camera', default_value='false',
+        description='Bridge camera images. Gazebo only renders a camera while its topic '
+                    'has a subscriber, so leaving this false makes SLAM/Nav2 runs skip the '
+                    'render cost entirely. Perception launches must set it true.'),
     DeclareLaunchArgument(
         'robot_model', default_value='waffle',
         description='waffle | waffle_rgbd (Phase 3). Selects model SDF, URDF and bridge YAML.'),
@@ -57,7 +62,8 @@ def _setup(context, *_args, **_kwargs):
     gui = LaunchConfiguration('gui')
 
     if not world:
-        world = os.path.join(tb3_gazebo_share, 'worlds', 'turtlebot3_world.world')
+        # Our fork, not turtlebot3_gazebo's: relaxed physics (250 Hz) and shadows off.
+        world = os.path.join(pkg_share, 'worlds', 'turtlebot3_world.world')
 
     model_sdf = os.path.join(pkg_share, 'models', f'turtlebot3_{robot_model}', 'model.sdf')
     urdf_path = os.path.join(pkg_share, 'urdf', f'turtlebot3_{robot_model}.urdf')
@@ -114,6 +120,9 @@ def _setup(context, *_args, **_kwargs):
 
     # Images go over image_bridge rather than parameter_bridge so they pick up
     # image_transport (compressed topics) for free.
+    #
+    # Gated: subscribing here is what makes Gazebo render the camera at all, so an
+    # unconditional image_bridge charges every SLAM/Nav2 run for an image nothing reads.
     image_topics = ['/camera/image_raw']
     if robot_model.endswith('rgbd'):
         image_topics.append('/camera/depth/image_raw')
@@ -124,6 +133,7 @@ def _setup(context, *_args, **_kwargs):
         output='screen',
         parameters=[sim_time],
         arguments=image_topics,
+        condition=IfCondition(LaunchConfiguration('camera')),
     )
 
     return [gz_server, gz_client, robot_state_publisher, spawn, bridge, image_bridge]

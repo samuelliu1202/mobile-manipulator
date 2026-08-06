@@ -1,7 +1,7 @@
 image: turtlebot3_world.pgm
 mode: trinary
 resolution: 0.050
-origin: [-0.953, -2.087, 0]
+origin: [-0.961, -2.070, 0]
 negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.196

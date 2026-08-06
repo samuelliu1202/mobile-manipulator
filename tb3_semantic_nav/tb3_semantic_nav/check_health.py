@@ -103,9 +103,30 @@ def main(argv=None):
         if topic in hz:
             note = f'  (nominal {exp_hz:.0f} Hz)' if exp_hz else ''
             print(f'  {topic:<26}{hz[topic]:>8.2f} Hz{note}')
-    if '/clock' in hz and hz['/clock'] > 0:
-        # world files use max_step_size 0.001 => 1000 Hz clock at RTF 1.0
-        print(f'\n  estimated real-time factor: {hz["/clock"] / 1000.0:.2f}')
+    # Real-time factor, measured as sim-time advance per wall second. Deliberately not
+    # derived from the /clock message rate: that needs a hardcoded nominal (1/max_step_size)
+    # which silently goes wrong when the physics step changes, and it under-reports when DDS
+    # drops messages at high clock rates.
+    if '/clock' in available:
+        from rosgraph_msgs.msg import Clock
+        latest = {}
+        cq = QoSProfile(depth=10, reliability=QoSReliabilityPolicy.BEST_EFFORT,
+                        durability=QoSDurabilityPolicy.VOLATILE,
+                        history=QoSHistoryPolicy.KEEP_LAST)
+        csub = node.create_subscription(
+            Clock, '/clock',
+            lambda m: latest.__setitem__('t', m.clock.sec + m.clock.nanosec * 1e-9), cq)
+        t0 = time.time()
+        while 't' not in latest and time.time() - t0 < 5:
+            rclpy.spin_once(node, timeout_sec=0.2)
+        if 't' in latest:
+            s0, w0 = latest['t'], time.time()
+            while time.time() - w0 < args.window:
+                rclpy.spin_once(node, timeout_sec=0.05)
+            rtf = (latest['t'] - s0) / (time.time() - w0)
+            print(f'\n  real-time factor: {rtf:.2f}   '
+                  f'(sim advanced {latest["t"] - s0:.2f}s in {args.window:.0f}s wall)')
+        node.destroy_subscription(csub)
 
     # ---- TF broadcaster uniqueness -----------------------------------------
     print('\n=== TF transforms seen ===')

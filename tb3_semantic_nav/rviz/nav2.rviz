@@ -468,50 +468,31 @@ Visualization Manager:
           Max Value: 1
           Median window: 5
           Min Value: 0
-          Name: RealsenseCamera
+          Name: Camera RGB
           Normalize Range: true
           Topic:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /intel_realsense_r200_depth/image_raw
+            Reliability Policy: Best Effort
+            Value: /camera/image_raw
           Value: true
-        - Alpha: 1
-          Autocompute Intensity Bounds: true
-          Autocompute Value Bounds:
-            Max Value: 10
-            Min Value: -10
-            Value: true
-          Axis: Z
-          Channel Name: intensity
-          Class: rviz_default_plugins/PointCloud2
-          Color: 255; 255; 255
-          Color Transformer: RGB8
-          Decay Time: 0
+        - Class: rviz_default_plugins/Image
           Enabled: true
-          Invert Rainbow: false
-          Max Color: 255; 255; 255
-          Max Intensity: 4096
-          Min Color: 0; 0; 0
-          Min Intensity: 0
-          Name: RealsenseDepthImage
-          Position Transformer: XYZ
-          Selectable: true
-          Size (Pixels): 3
-          Size (m): 0.009999999776482582
-          Style: Flat Squares
+          Max Value: 1
+          Median window: 5
+          Min Value: 0
+          Name: Camera Depth (32FC1, auto-scaled)
+          Normalize Range: true
           Topic:
             Depth: 5
             Durability Policy: Volatile
             History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /intel_realsense_r200_depth/points
-          Use Fixed Frame: true
-          Use rainbow: true
+            Reliability Policy: Best Effort
+            Value: /camera/depth/image_raw
           Value: true
-      Enabled: false
-      Name: Realsense
+      Enabled: true
+      Name: Camera
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
       Name: MarkerArray

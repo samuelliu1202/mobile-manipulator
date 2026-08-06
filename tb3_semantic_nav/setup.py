@@ -45,6 +45,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            # verification / bring-up tools
+            'explore_drive = tb3_semantic_nav.explore_drive:main',
+            'nav_goal_test = tb3_semantic_nav.nav_goal_test:main',
+            'check_health = tb3_semantic_nav.check_health:main',
             # Phase 4+ perception nodes are registered here.
         ],
     },

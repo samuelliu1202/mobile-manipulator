@@ -118,25 +118,39 @@ def _setup(context, *_args, **_kwargs):
         arguments=['--ros-args', '-p', f'config_file:={bridge_yaml}'],
     )
 
-    # Images go over image_bridge rather than parameter_bridge so they pick up
-    # image_transport (compressed topics) for free.
+    # Heavy camera streams live in their own bridge, gated on `camera`. Subscribing is
+    # what makes Gazebo render the camera at all, so bridging images unconditionally
+    # charges every SLAM/Nav2 run for an image nothing reads (measured: RTF 0.59 vs 0.96).
     #
-    # Gated: subscribing here is what makes Gazebo render the camera at all, so an
-    # unconditional image_bridge charges every SLAM/Nav2 run for an image nothing reads.
-    image_topics = ['/camera/image_raw']
-    if robot_model.endswith('rgbd'):
-        image_topics.append('/camera/depth/image_raw')
-    image_bridge = Node(
-        package='ros_gz_image',
-        executable='image_bridge',
-        name='image_bridge',
-        output='screen',
-        parameters=[sim_time],
-        arguments=image_topics,
-        condition=IfCondition(LaunchConfiguration('camera')),
-    )
+    # parameter_bridge rather than image_bridge because gz names the rgbd sub-topics
+    # camera/image and camera/depth_image, and only parameter_bridge can rename them to
+    # the ROS-conventional camera/image_raw and camera/depth/image_raw.
+    camera_bridge_yaml = os.path.join(pkg_share, 'config', f'{robot_model}_camera_bridge.yaml')
+    actions = [gz_server, gz_client, robot_state_publisher, spawn, bridge]
 
-    return [gz_server, gz_client, robot_state_publisher, spawn, bridge, image_bridge]
+    if os.path.exists(camera_bridge_yaml):
+        actions.append(Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            name='camera_bridge',
+            output='screen',
+            parameters=[sim_time],
+            arguments=['--ros-args', '-p', f'config_file:={camera_bridge_yaml}'],
+            condition=IfCondition(LaunchConfiguration('camera')),
+        ))
+    else:
+        # Plain (non-RGBD) models still publish a single RGB stream under its gz name.
+        actions.append(Node(
+            package='ros_gz_image',
+            executable='image_bridge',
+            name='image_bridge',
+            output='screen',
+            parameters=[sim_time],
+            arguments=['/camera/image_raw'],
+            condition=IfCondition(LaunchConfiguration('camera')),
+        ))
+
+    return actions
 
 
 def generate_launch_description():

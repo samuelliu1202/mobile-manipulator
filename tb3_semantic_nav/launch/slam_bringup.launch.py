@@ -23,6 +23,7 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
     world = LaunchConfiguration('world')
     robot_model = LaunchConfiguration('robot_model')
+    camera = LaunchConfiguration('camera')
     scan_topic = LaunchConfiguration('scan_topic')
     use_rviz = LaunchConfiguration('rviz')
     gui = LaunchConfiguration('gui')
@@ -31,6 +32,8 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         DeclareLaunchArgument('world', default_value=''),
         DeclareLaunchArgument('robot_model', default_value='waffle'),
+        DeclareLaunchArgument('camera', default_value='false',
+                              description='Bridge camera streams. Costs render time; leave false unless perception needs it.'),
         DeclareLaunchArgument('scan_topic', default_value='/scan'),
         DeclareLaunchArgument('rviz', default_value='true'),
         DeclareLaunchArgument('gui', default_value='true'),
@@ -38,7 +41,8 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(launch_dir, 'sim.launch.py')),
             launch_arguments={'use_sim_time': use_sim_time, 'world': world,
-                              'robot_model': robot_model, 'gui': gui}.items(),
+                              'robot_model': robot_model, 'gui': gui,
+                              'camera': camera}.items(),
         ),
 
         # Gazebo must be up and publishing /clock before slam_toolbox latches onto

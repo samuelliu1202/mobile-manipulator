@@ -12,7 +12,8 @@ semantic perception pipeline on top.
 | 0 | Install TB3 packages, verify sensors render | done |
 | 1 | Stock SLAM + Nav2 baseline | done |
 | 2 | This package: forked sim bringup + wrapper launches | done |
-| 3 | `waffle_rgbd` model with a depth camera | not started |
+| 2.5 | Simulation performance: RTF 0.27 -> 0.99 | done |
+| 3 | `waffle_rgbd` model with a depth camera | done |
 | 4 | YOLO detector node → `vision_msgs/Detection2DArray` | not started |
 | 5 | Semantic projector (RGBD + LiDAR fusion) → `MarkerArray` | not started |
 | 6 | Dynamic-object filtering → `/scan_filtered` | not started |
@@ -39,8 +40,15 @@ ros2 launch tb3_semantic_nav nav2_bringup.launch.py map:=<abs path>/<name>.yaml
 # RViz: "2D Pose Estimate" to seed AMCL, then "Nav2 Goal"
 ```
 
+**Run with the depth camera** (what the perception phases use):
+```bash
+ros2 launch tb3_semantic_nav nav2_bringup.launch.py robot_model:=waffle_rgbd camera:=true
+# -> /camera/image_raw  /camera/depth/image_raw (32FC1 metres)  /camera/camera_info
+```
+
 **Useful arguments** (all launches): `world:=<abs path>`, `robot_model:=waffle|waffle_rgbd`,
-`gui:=false` (headless), `rviz:=false`, `scan_topic:=/scan_filtered` (Phase 6).
+`camera:=true|false` (default false), `gui:=false` (headless), `rviz:=false`,
+`scan_topic:=/scan_filtered` (Phase 6).
 
 ## Layout
 
@@ -75,10 +83,29 @@ read-only share directory, so a custom model like `waffle_rgbd` cannot be pointe
 `max_laser_range: 3.5` in the SLAM config and `obstacle_max_range: 2.5` / `raytrace_max_range: 3.0`
 in the costmaps. The old TB4 config used `max_laser_range: 20.0` against a 12 m RPLIDAR.
 
-**Known: the stock camera is a performance trap.** The upstream waffle SDF renders at
-1920×1080 @ 30 Hz, which drops Gazebo to **RTF ≈ 0.27** on this machine (measured: camera-less
-burger runs at RTF 0.93). Phase 3 drops it to 640×480 @ 15 Hz, which is also all CPU YOLO can
-consume. Until then, expect mapping runs to take ~4× wall-clock.
+**Simulation speed: RTF 0.27 → 0.99.** The upstream waffle rendered 1920×1080 @ 30 Hz, which
+pinned Gazebo at RTF 0.27. Now 640×480 @ 10 Hz, physics 250 Hz instead of 1 kHz, shadows and
+sensor visualization off, and — the biggest single lever — **camera streams bridged only when
+`camera:=true`**, because Gazebo renders a camera only while one of its topics has a
+subscriber. Gating it took SLAM/Nav2 runs from 0.59 to 0.96.
+
+The bottleneck was never CPU: the gz server used 143–201% of a possible 2000%, so the cost is
+GPU round-trip latency through WSL's d3d12 layer. Adding cores will not help.
+
+**Keep the heavy camera topics out of `waffle_rgbd_bridge.yaml`.** That bridge always runs, so
+a subscription there would force the camera to render on every launch and silently undo the
+`camera:=false` win. Images and depth belong in `waffle_rgbd_camera_bridge.yaml`, which is
+gated. The always-on bridge carries only `camera_info`.
+
+**Measure with `check_health`, not Gazebo's own number.** gz's self-reported
+`real_time_factor` reads 0.82–0.86 where true throughput is 0.54, because it does not count
+stalls. `check_health` measures sim-time advance per wall second, which is also immune to the
+physics step size changing.
+
+**`slam_toolbox` is a lifecycle node.** Spawning it as a plain `Node` leaves it `unconfigured`
+forever — no `/scan` subscription, no parameters (declared in `on_configure`), no `/map`, and
+**no error logged**. `slam.launch.py` uses `LifecycleNode` with explicit configure/activate
+events. Same care applies to anything else lifecycle-based.
 
 **Local vs global costmap scans (Phase 6).** When `/scan_filtered` lands, SLAM / AMCL / the global
 costmap consume the filtered scan so people never enter the static map, while the **local** costmap

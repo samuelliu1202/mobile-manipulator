@@ -49,6 +49,7 @@ setup(
             'explore_drive = tb3_semantic_nav.explore_drive:main',
             'nav_goal_test = tb3_semantic_nav.nav_goal_test:main',
             'check_health = tb3_semantic_nav.check_health:main',
+            'depth_check = tb3_semantic_nav.depth_check:main',
             # Phase 4+ perception nodes are registered here.
         ],
     },

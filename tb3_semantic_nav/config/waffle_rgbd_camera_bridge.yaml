@@ -1,0 +1,17 @@
+# Heavy camera streams, bridged only when camera:=true.
+#
+# /camera/points is intentionally absent. A 640x480 point cloud is ~9.8 MB/frame,
+# ~98 MB/s at 10 Hz, and the semantic projector reconstructs the same 3D points
+# from the depth image plus camera_info anyway. Add it back only as a temporary
+# RViz debugging aid.
+- ros_topic_name: "camera/image_raw"
+  gz_topic_name: "camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "camera/depth/image_raw"
+  gz_topic_name: "camera/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS

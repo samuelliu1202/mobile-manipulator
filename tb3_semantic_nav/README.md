@@ -89,8 +89,25 @@ sensor visualization off, and — the biggest single lever — **camera streams 
 `camera:=true`**, because Gazebo renders a camera only while one of its topics has a
 subscriber. Gating it took SLAM/Nav2 runs from 0.59 to 0.96.
 
-The bottleneck was never CPU: the gz server used 143–201% of a possible 2000%, so the cost is
-GPU round-trip latency through WSL's d3d12 layer. Adding cores will not help.
+The bottleneck was never CPU: the gz server used 143–201% of a possible 2000%. Adding cores
+will not help.
+
+**Do not "fix" the software renderer.** `glxinfo -B` reports `llvmpipe` / `Accelerated: no` —
+Gazebo renders on the CPU, because WSL has no `/dev/dri` node so Mesa cannot autodetect the
+`d3d12` driver. That looks like a bug and is tempting to correct. It is not: hardware
+acceleration measured **2× slower** on both of this machine's Intel GPUs.
+
+| Renderer (`waffle_rgbd camera:=true gui:=false`) | RTF | gz CPU |
+|---|---|---|
+| llvmpipe (default, software) | **0.99** | 163% |
+| `GALLIUM_DRIVER=d3d12` → Arc A370M | 0.52 | 90% |
+| `GALLIUM_DRIVER=d3d12` → Iris Xe | 0.43 | 84% |
+
+WSL's d3d12 layer has a large per-frame round-trip cost, and a 640×480 @ 10 Hz render is far
+too small to amortize it. The GPU saves CPU we do not need and costs RTF we do.
+
+This says nothing about **YOLO** — inference goes through Level Zero / OpenCL, a different
+driver path from OpenGL. The Arc may still be worth using there.
 
 **Keep the heavy camera topics out of `waffle_rgbd_bridge.yaml`.** That bridge always runs, so
 a subscription there would force the camera to render on every launch and silently undo the

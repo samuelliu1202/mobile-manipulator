@@ -12,6 +12,12 @@ Usage:
     ros2 run tb3_semantic_nav nav_goal_test                       # defaults for turtlebot3_world
     ros2 run tb3_semantic_nav nav_goal_test --goals 4.0,0.0 1.5,-1.3
     ros2 run tb3_semantic_nav nav_goal_test --init 0,0 --goals 2,2 --timeout 300
+
+    # turtlebot3_house (main room). Pass the list as ONE quoted string whenever any
+    # goal is negative -- argparse otherwise reads "-1.45,-0.69" as an option and
+    # silently truncates the list, reporting "goal 1/1" as if all was well.
+    ros2 run tb3_semantic_nav nav_goal_test --init 0,0 \
+        --goals "5.30,-1.29 -1.45,-0.69 1.85,-0.79"
 """
 
 import argparse
@@ -27,8 +33,9 @@ from tf2_ros import Buffer, TransformListener
 
 
 def _xy(text):
+    """Parse "x,y". Tolerates surrounding whitespace, which matters -- see below."""
     x, y = text.split(',')
-    return float(x), float(y)
+    return float(x.strip()), float(y.strip())
 
 
 def make_pose(nav, x, y, yaw=0.0):
@@ -57,13 +64,24 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     p.add_argument('--init', type=_xy, default=(0.0, 0.0),
                    help='initial pose "x,y" in the map frame (default 0,0)')
-    p.add_argument('--goals', type=_xy, nargs='+',
-                   default=[(4.02, -0.06), (1.47, -1.26), (0.0, 0.0)],
-                   help='goals as "x,y" pairs; defaults are open cells of turtlebot3_world')
+    p.add_argument('--goals', nargs='+', default=None,
+                   help='goals as "x,y" pairs, or one quoted "x1,y1 x2,y2" string; '
+                        'defaults are open cells of turtlebot3_world')
     p.add_argument('--timeout', type=float, default=240.0, help='per-goal wall-clock limit, s')
     p.add_argument('--tolerance', type=float, default=0.30,
                    help='pass threshold for final distance to goal, m')
     args, ros_args = p.parse_known_args(argv)
+
+    # argparse treats a value like "-1.45,-0.69" as an OPTION, not a negative number:
+    # its negative-number matcher only accepts bare numerals, and the comma breaks it.
+    # The symptom is silent -- the goal list gets truncated at the first negative entry
+    # and the run reports "goal 1/1" while otherwise looking healthy. Splitting on
+    # whitespace here means the whole list can be passed as one quoted string:
+    #     --goals "5.3,-1.29 -1.45,-0.69 1.85,-0.79"
+    if args.goals is None:
+        args.goals = [(4.02, -0.06), (1.47, -1.26), (0.0, 0.0)]
+    else:
+        args.goals = [_xy(tok) for entry in args.goals for tok in entry.split()]
 
     rclpy.init(args=ros_args)
     nav = BasicNavigator()

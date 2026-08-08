@@ -50,7 +50,8 @@ setup(
             'nav_goal_test = tb3_semantic_nav.nav_goal_test:main',
             'check_health = tb3_semantic_nav.check_health:main',
             'depth_check = tb3_semantic_nav.depth_check:main',
-            # Phase 4+ perception nodes are registered here.
+            # perception
+            'yolo_detector = tb3_semantic_nav.yolo_detector_node:main',
         ],
     },
 )

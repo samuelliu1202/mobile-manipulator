@@ -1,0 +1,66 @@
+# Phase 4 perception parameters.
+#
+# Every default here was measured, not guessed. Change one value at a time and
+# re-measure; the levers interact.
+
+# Everything lives under the /** wildcard on purpose.
+#
+# ROS 2 gives node-specific keys (e.g. "yolo_detector:") precedence over wildcard
+# keys REGARDLESS of the order the parameter files are given in. A node-specific
+# block here would therefore silently outrank every `ros2 launch ... imgsz:=320`
+# override. That trap cost a whole tuning round: three different configurations
+# all reported identical numbers because none of the command-line arguments were
+# reaching the node, and nothing errored.
+/**:
+  ros__parameters:
+    use_sim_time: true
+
+    # Either a PyTorch checkpoint (yolo11n.pt) or an exported OpenVINO IR
+    # directory (yolo11n_openvino_model). Ultralytics dispatches on the path.
+    # Bare names resolve under ~/.cache/tb3_semantic_nav/models.
+    #
+    # OpenVINO measured 1.3x faster than PyTorch at 640 and 1.7x at 320, with no
+    # quality loss. yolo11s costs 2x for no reliable gain on this
+    # world -- extra capacity mostly buys more confident hallucinations.
+    model: "yolo11n_openvino_model"
+
+    # cpu | intel:cpu | intel:gpu.0 (Iris Xe iGPU) | intel:gpu.1 (Arc A370M dGPU)
+    #
+    # intel:* need an OpenVINO IR directory, not a .pt. There is no CUDA here.
+    # Needs intel-opencl-icd / libze-intel-gpu1 / libze1 (installed).
+    #
+    # gpu.0 measured best on every axis: 11 ms vs 46 ms on CPU,
+    # 85% CPU vs 203%, RTF 0.734 vs 0.712. It is also otherwise idle, since Gazebo
+    # renders on llvmpipe, so inference stops competing for the memory bus.
+    #
+    # DO NOT use intel:gpu.1 (the Arc). It runs fast but returns an all-zeros output
+    # tensor -- 300 phantom "person" detections per frame at exactly 0.50. Broken
+    # driver-side, silently. Fall back to intel:cpu if the iGPU is unavailable.
+    device: "intel:gpu.0"
+
+    # Must match the imgsz the OpenVINO IR was exported at -- the graph has a
+    # static input shape, so a mismatch silently costs a resize every frame.
+    # On the iGPU, 640 costs 11 ms -- less than the CPU needed for 320 (14 ms) --
+    # so there is no longer a reason to trade away 640's better confidence
+    # (person 0.93 vs 0.85). Switch to yolo11n_openvino_model320 with imgsz 320
+    # only if falling back to CPU.
+    imgsz: 640
+    conf: 0.35
+    iou: 0.45
+
+    # The camera renders at 10 Hz. Detecting slower than that is fine and
+    # intentional -- surplus frames are dropped, never queued.
+    detection_rate_hz: 5.0
+
+    # Gazebo wants ~1.6 cores of the 20 available. Left uncapped PyTorch takes all
+    # of them and starves the render loop, which presents as falling RTF and looks
+    # like a Gazebo fault.
+    torch_threads: 6
+
+    # Empty ("" entries are ignored) means keep every COCO class. Narrow this
+    # once the semantic map's vocabulary is settled; Phase 6 needs "person".
+    class_filter: [""]
+
+    image_topic: "/camera/image_raw"
+    publish_debug_image: true
+    stats_period_s: 10.0
